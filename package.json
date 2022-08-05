@@ -1,0 +1,76 @@
+{
+	"name": "postfixer",
+	"displayName": "Postfixer",
+	"description": "Postfix completions plugin for VScode",
+	"publisher": "rahulsinha",
+	"icon": "docs/logo.png",
+	"version": "0.0.7",
+	"engines": {
+		"vscode": "^1.66.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"*"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/rahulsenna/vscode-postfixer.git"
+	},
+	"main": "./out/extension.js",
+	"contributes": {
+		"keybindings": [
+		],
+		"commands": [
+			{
+				"command": "postfixer.fix",
+				"title": "Postfixer: fix"
+			},
+			{
+				"command": "postfixer.reload",
+				"title": "Postfixer: reload snippets"
+			},
+			{
+				"command": "postfixer.edit",
+				"title": "Postfixer: edit snippets"
+			}
+		],
+
+		"configuration": {
+			"title": "Postfixer",
+			"properties": {
+			  "postfixer.fallback_command": {
+				"type": "string",
+				"default": "fallback.command",
+				"description": "Enter a command you wish to execute in case posfix doesn't match snippets"
+			  }
+			  }
+			}
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"pretest": "npm run compile && npm run lint",
+		"lint": "eslint src --ext ts",
+		"test": "node ./out/test/runTest.js"
+	},
+	"devDependencies": {
+		"@types/vscode": "^1.66.0",
+		"@types/glob": "^7.2.0",
+		"@types/mocha": "^9.1.0",
+		"@types/node": "14.x",
+		"@typescript-eslint/eslint-plugin": "^5.16.0",
+		"@typescript-eslint/parser": "^5.16.0",
+		"eslint": "^8.11.0",
+		"glob": "^7.2.0",
+		"mocha": "^9.2.2",
+		"typescript": "^4.5.5",
+		"@vscode/test-electron": "^2.1.3"
+	},
+	"dependencies": {
+		"vscode-languageclient": "^7.0.0",
+		"js-yaml": "^4.1.0"
+	}
+}

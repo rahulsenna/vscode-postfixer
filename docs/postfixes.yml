@@ -1,0 +1,309 @@
+# Structure of fix
+# 
+# {scope}[ {scope}[...]]: - one or multiple (separated by whitespace) scopes
+#   - cmd    - trigger string
+#     target - regex pattern
+#     fix    - template
+
+# Available variables
+# 
+# $-->    - indent
+# $cursor - cursor position
+# $0      - whole matched string
+# $X      - RegEx group indexed from 1
+
+# Some examples:
+
+# C C++
+
+
+# Python
+python:
+  # Print
+  - cmd: "pr"
+    line: true
+    target: ".+"
+    fix: |
+      print("$0: ", $0)
+
+  # If
+  - cmd: "if"
+    line: true
+    target: ".+"
+    fix: |
+      if $0:
+      $-->
+
+  # If not
+  - cmd: "ifn"
+    line: true
+    target: ".+"
+    fix: |
+      if !$0:
+      $-->
+
+  # Read file
+  - cmd: "rf"
+    line: true
+    target: "(.+?)\\s?[=\\s]\\s?(.+)"
+    fix: |
+      with open($2) as f:
+      $-->$1 = f.read()
+
+  # Write file
+  - cmd: "wf"
+    line: true
+    target: "(.+?)\\s?[=\\s]\\s?(.+)"
+    fix: |
+      with open($1, "w") as f:
+      $-->f.write($2)
+
+
+# C, C++
+cpp c:
+  # If
+  - cmd: "if"
+    line: true
+    target: ".+"
+    fix: |
+      if ($0) { $cursor; }
+
+  - cmd: "el"
+    line: true
+    target: ".+"
+    fix: |
+      else
+      {
+      $-->$0
+      }$cursor
+
+  # Inlined If
+  - cmd: "ifi"
+    line: true
+    target: ".+"
+    fix: |
+      if ($0) 
+
+  # If not
+  - cmd: "ifn"
+    line: true
+    target: ".+"
+    fix: |
+      if (!$0) 
+      {
+      $-->$cursor
+      }
+
+
+  - cmd: "not"
+    line: false
+    target: ".+"
+    fix: |
+      !$0$cursor
+
+  - cmd: "cst"
+    line: false
+    target: "(\\w+)\\.(\\w+)"
+    fix: |
+      (($2)$1)$cursor
+
+
+  - cmd: "ret"
+    line: false
+    target: "(\\w+)"
+    fix: |
+      return($0)$cursor;
+
+
+  - cmd: "for"
+    line: true
+    target: ".+"
+    fix: |
+      for (u32 i = 0; i < $0; ++i)
+      {
+      $-->$cursor 
+      }
+
+  # Equality
+  - cmd: "eq"
+    line: true
+    target: "(.+)\\s(.+)"
+    fix: |
+      if ($1 == $2)
+      {
+      $-->$cursor
+      }
+
+  # InEquality
+  - cmd: "neq"
+    line: true
+    target: "(.+)\\s(.+)"
+    fix: |
+      if ($1 != $2)
+      {
+      $-->$cursor
+      }
+
+
+  - cmd: "str"
+    line: true
+    target: ".+"
+    fix: |
+      typedef struct
+      {
+      $-->$cursor
+      } $0;
+
+  - cmd: "prd"
+    line: true
+    target: ".+"
+    fix: |
+      printf("$0: %d$cursor\n", $0);
+
+  - cmd: "prs"
+    line: true
+    target: ".+"
+    fix: |
+      printf("$0: %s$cursor\n", $0);
+
+  - cmd: "pr"
+    line: true
+    target: ".+"
+    fix: |
+      printf("$0\n");
+
+
+  - cmd: "si"
+    line: false
+    target: "(\\w+)"
+    fix: |
+      sizeof($1)$cursor
+
+
+  - cmd: "co"
+    line: true
+    target: ".+"
+    fix: |
+      std::cout << "$0" << $0 << std::endl;$cursor
+
+
+# Javascript, Typescript
+javascript typescript:
+  - cmd: "ret"
+    line: false
+    target: "(\\w+)"
+    fix: |
+      return($0)$cursor;
+
+  # If
+  - cmd: "if"
+    line: true
+    target: ".+"
+    fix: |
+      if ($0)
+      {
+      $-->$cursor
+      }
+  # Inlined If
+  - cmd: "ifi"
+    line: true
+    target: ".+"
+    fix: |
+      if ($0) 
+  # If not
+  - cmd: "ifn"
+    line: true
+    target: ".+"
+    fix: |
+      if (!$0)
+      {
+      $-->$cursor
+      }
+  # Equality
+  - cmd: "eq"
+    line: true
+    target: "(.+)\\s(.+)"
+    fix: |
+      if ($1 === $2)
+      {
+      $-->$cursor
+      }
+  # NotEquality
+  - cmd: "neq"
+    line: true
+    target: "(.+)\\s(.+)"
+    fix: |
+      if ($1 !== $2)
+      {
+      $-->$cursor
+      }
+  # Function
+  - cmd: "fun"
+    line: true
+    target: "([a-zA-Z0-9_]+)\\s?(.*)"
+    fix: |
+      function $1($2)
+      {
+      $-->$cursor
+      }
+  # Log
+  - cmd: "lg"
+    line: true
+    target: ".+"
+    fix: |
+      console.log("$0$cursor: ", $0)
+  - cmd: "llg"
+    line: false
+    target: ".+"
+    fix: |
+      console.log("$0");
+  - cmd: "prd"
+    line: true
+    target: ".+"
+    fix: |
+      console.log("$0$cursor: ", $0)
+  # Fetch
+  - cmd: "fetch"
+    line: true
+    target: ".+"
+    fix: |
+      fetch($0)
+      $-->.then(res => {
+      $-->$-->$cursor
+      $-->})
+      $-->.catch(err => {
+      $-->$-->
+      $-->})
+
+  # Arrays Arrow
+  - cmd: "rd"
+    line: true
+    target: ".+"
+    fix: |
+      $0.reduce((sum,e)=> sum$cursor+e,0)
+
+  - cmd: "fl"
+    line: true
+    target: ".+"
+    fix: |
+      $0.filter((e,i$cursor)=> e>1)
+
+  - cmd: "fe"
+    line: true
+    target: ".+"
+    fix: |
+      $0.forEach((e,i$cursor)=> e)
+
+  - cmd: "mp"
+    line: true
+    target: ".+"
+    fix: |
+      $0.map(x=> x*$cursor2)
+
+  - cmd: "st"
+    line: true
+    target: ".+"
+    fix: |
+      $0.sort((a,b)=> a-b$cursor)
+
+# ... and so on
