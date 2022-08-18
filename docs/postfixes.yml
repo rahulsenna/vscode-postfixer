@@ -61,6 +61,11 @@ python:
 
 # C, C++
 cpp c:
+  - cmd: "nn"
+    line: false
+    target: "(\\w+)\\s(\\w+)"
+    fix: |
+      !$1 fuck$cursor $2
   # If
   - cmd: "if"
     line: true
@@ -97,7 +102,7 @@ cpp c:
 
   - cmd: "not"
     line: false
-    target: ".+"
+    target: "w+"
     fix: |
       !$0$cursor
 
@@ -112,7 +117,7 @@ cpp c:
     line: false
     target: "(\\w+)"
     fix: |
-      return($0)$cursor;
+      return($0);$cursor
 
 
   - cmd: "for"
@@ -155,14 +160,14 @@ cpp c:
       } $0;
 
   - cmd: "prd"
-    line: true
-    target: ".+"
+    line: false
+    target: "\\w+"
     fix: |
       printf("$0: %d$cursor\n", $0);
 
   - cmd: "prs"
-    line: true
-    target: ".+"
+    line: false
+    target: "\\w+"
     fix: |
       printf("$0: %s$cursor\n", $0);
 
@@ -191,7 +196,7 @@ cpp c:
 javascript typescript:
   - cmd: "ret"
     line: false
-    target: "(\\w+)"
+    target: "[\\w.]+"
     fix: |
       return($0)$cursor;
 
@@ -254,9 +259,9 @@ javascript typescript:
       console.log("$0$cursor: ", $0)
   - cmd: "llg"
     line: false
-    target: ".+"
+    target: "[\\w.]+"
     fix: |
-      console.log("$0");
+      console.log("$0: ", $0);
   - cmd: "prd"
     line: true
     target: ".+"
