@@ -28,7 +28,7 @@ function init_fixes(): void
 
 const FIX_RE = /^(?<indent>\s*)(?<target>.+)\.(?<cmd>.+)$/g
 const VAR_CURSOR = "$cursor"
-const VAR_INDENT = "$-->"
+const VAR_INDENT = /\$-->/g
 const VAR_WHOLE = /\$0/g;
 
 let indent_str = "\t"
