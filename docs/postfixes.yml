@@ -71,7 +71,10 @@ cpp c:
     line: true
     target: ".+"
     fix: |
-      if ($0) { $cursor; }
+      if ($0)
+      { 
+      $-->$cursor
+      }
 
   - cmd: "el"
     line: true
@@ -98,26 +101,6 @@ cpp c:
       {
       $-->$cursor
       }
-
-
-  - cmd: "not"
-    line: false
-    target: "w+"
-    fix: |
-      !$0$cursor
-
-  - cmd: "cst"
-    line: false
-    target: "(\\w+)\\.(\\w+)"
-    fix: |
-      (($2)$1)$cursor
-
-
-  - cmd: "ret"
-    line: false
-    target: "(\\w+)"
-    fix: |
-      return($0);$cursor
 
 
   - cmd: "for"
@@ -159,15 +142,35 @@ cpp c:
       $-->$cursor
       } $0;
 
+
+  - cmd: "not"
+    line: false
+    target: "w+"
+    fix: |
+      !$0$cursor
+
+  - cmd: "cst"
+    line: false
+    target: "(\\w+)\\.(\\w+)"
+    fix: |
+      (($2)$1)$cursor
+
+
+  - cmd: "ret"
+    line: false
+    target: "([^\\s]+)"
+    fix: |
+      return($0);$cursor
+
   - cmd: "prd"
     line: false
-    target: "\\w+"
+    target: "([^\\s]+)"
     fix: |
       printf("$0: %d$cursor\n", $0);
 
   - cmd: "prs"
     line: false
-    target: "\\w+"
+    target: "([^\\s]+)"
     fix: |
       printf("$0: %s$cursor\n", $0);
 
@@ -192,6 +195,29 @@ cpp c:
       std::cout << "$0" << $0 << std::endl;$cursor
 
 
+  - cmd: "main"
+    line: true
+    target: ".+"
+    fix: |
+      int main()
+      {
+      $-->$cursor
+      $-->return(0);
+      }
+
+  - cmd: "mainst"
+    line: true
+    target: ".+"
+    fix: |
+      #include <stdio.h>
+      #include <stdlib.h>
+
+      int main()
+      {
+      $-->printf("Hello, Sailor!\n");$cursor
+      $-->return(0);
+      }
+
 # Javascript, Typescript
 javascript typescript:
   - cmd: "ret"
@@ -199,6 +225,16 @@ javascript typescript:
     target: "[\\w.]+"
     fix: |
       return($0)$cursor;
+
+  # For
+  - cmd: "for"
+    line: true
+    target: ".+"
+    fix: |
+      for (let i=0; i<$0; ++i)
+      {
+      $-->$cursor
+      }
 
   # If
   - cmd: "if"

@@ -153,7 +153,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	let edit = vscode.commands.registerCommand('postfixer.edit', () => {
 
-		var snippets: vscode.Uri = vscode.Uri.parse(yaml_file);
+		var snippets: vscode.Uri = vscode.Uri.file(yaml_file);
 		vscode.workspace.openTextDocument(snippets).then((a: vscode.TextDocument) => {
 			vscode.window.showTextDocument(a, 1, false)
 		}, (error: any) => {
