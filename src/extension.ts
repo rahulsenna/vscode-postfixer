@@ -70,7 +70,7 @@ function get_fix(fixes: any[], line: string): Postfix
 
 	if (target_match.length > 1) {
 		target_match.forEach((match, index) => {
-			parsed = parsed.replace("$" + index, match);
+			parsed = parsed.replace(new RegExp("\\$" + index, "g"), match);
 		});
 	}
 

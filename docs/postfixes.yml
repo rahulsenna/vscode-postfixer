@@ -107,7 +107,16 @@ cpp c:
     line: true
     target: ".+"
     fix: |
-      for (u32 i = 0; i < $0; ++i)
+      for (size_t i = 0; i < $0; ++i)
+      {
+      $-->$cursor 
+      }
+
+  - cmd: "forj"
+    line: true
+    target: "(.+)\\s(.+)"
+    fix: |
+      for (size_t $2 = 0; $2 < $1; ++$2)
       {
       $-->$cursor 
       }
@@ -192,13 +201,16 @@ cpp c:
     line: true
     target: ".+"
     fix: |
-      std::cout << "$0" << $0 << std::endl;$cursor
+      std::cout << "$0: " << $0 << '\n';$cursor
 
 
   - cmd: "main"
     line: true
     target: ".+"
     fix: |
+      #include <bits/stdc++.h>
+      using namespace std;
+
       int main()
       {
       $-->$cursor
@@ -298,11 +310,11 @@ javascript typescript:
     target: "[\\w.]+"
     fix: |
       console.log("$0: ", $0);
-  - cmd: "prd"
+  - cmd: "pr"
     line: true
     target: ".+"
     fix: |
-      console.log("$0$cursor: ", $0)
+      console.log("$0$cursor")
   # Fetch
   - cmd: "fetch"
     line: true

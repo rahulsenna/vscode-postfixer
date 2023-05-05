@@ -4,7 +4,7 @@
 	"description": "Postfix completions plugin for VScode",
 	"publisher": "rahulsinha",
 	"icon": "docs/logo.png",
-	"version": "0.0.10",
+	"version": "0.0.11",
 	"engines": {
 		"vscode": "^1.66.0"
 	},
@@ -12,9 +12,6 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:postfixer.fix",
-		"onCommand:postfixer.reload",
-		"onCommand:postfixer.edit"
 
 	],
 	"repository": {
