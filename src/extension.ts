@@ -5,7 +5,8 @@ import * as fs from 'fs'; // In NodeJS: 'const fs = require('fs')';
 const yaml = require('js-yaml');
 
 const path = require('path');
-const yaml_file = path.join(__dirname, 'postfixes.yml');
+
+let config_file = "";
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -15,7 +16,7 @@ let postfixes: any;
 function init_fixes(): void
 {
 	user_config = vscode.workspace.getConfiguration('postfixer');
-	postfixes = yaml.load(fs.readFileSync(yaml_file, 'utf8'));
+	postfixes = yaml.load(fs.readFileSync(config_file, 'utf8'));
 	for (const scopes in postfixes) 
 	{
 		for (const scope of scopes.split(' '))
@@ -102,7 +103,17 @@ function get_fix(fixes: any[], line: string): Postfix
 }
 
 export function activate(context: vscode.ExtensionContext) {
-	
+	const configPath = vscode.Uri.joinPath(context.globalStorageUri, 'config.yml');
+	config_file = configPath.fsPath;
+	try 
+	{
+        fs.accessSync(configPath.fsPath);
+    } catch 
+	{
+        fs.mkdirSync(context.globalStorageUri.fsPath, { recursive: true });
+        fs.copyFileSync(path.join(__dirname, '../docs/postfixes.yml'), configPath.fsPath);
+    }
+
 	init_fixes();
 
 	let fix = vscode.commands.registerCommand('postfixer.fix', () => {
@@ -153,7 +164,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	let edit = vscode.commands.registerCommand('postfixer.edit', () => {
 
-		var snippets: vscode.Uri = vscode.Uri.file(yaml_file);
+		var snippets: vscode.Uri = vscode.Uri.file(config_file);
 		vscode.workspace.openTextDocument(snippets).then((a: vscode.TextDocument) => {
 			vscode.window.showTextDocument(a, 1, false)
 		}, (error: any) => {
