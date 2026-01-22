@@ -116,6 +116,49 @@ export function activate(context: vscode.ExtensionContext) {
 
 	init_fixes();
 
+	for (const scope in postfixes) {
+		const provider = vscode.languages.registerCompletionItemProvider(
+			scope,
+			{
+				provideCompletionItems(document, position) {
+					const completionItems: vscode.CompletionItem[] = [];
+
+					postfixes[scope].forEach((postfix: any) => {
+
+						if (postfix == null)
+							return;
+
+						const safePreview = postfix.fix.trim()
+							.replace("$cursor", '')
+							// .replace(/\$\d/g, '')
+							.replace("-->", '')
+							.replace('"', '')
+							.replace(/`/g, '')
+							// .replace(/\$/g, '')
+							.substring(0, 20) + '...';
+
+						const index = postfixes[scope].indexOf(postfix);
+
+						const item = new vscode.CompletionItem(
+							postfix.cmd,
+							vscode.CompletionItemKind.Snippet
+						);
+
+						item.documentation = new vscode.MarkdownString(`\`\`\`${scope}\n${postfix.fix}\n${postfix.target}\n\`\`\``);
+						item.label = postfix.cmd;
+						item.detail = `[fix] ${safePreview} [${index}]`;
+						item.insertText = new vscode.SnippetString(postfix.cmd);
+						item.sortText = safePreview;
+
+						completionItems.push(item);
+					});
+					return completionItems;
+				}
+			}
+		);
+		context.subscriptions.push(provider);
+	}
+
 	let fix = vscode.commands.registerCommand('postfixer.fix', () => {
 		
 		const editor = vscode.window.activeTextEditor;
