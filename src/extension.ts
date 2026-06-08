@@ -92,7 +92,8 @@ function get_fix(fixes: any[], line: string): Postfix
 				return;
 			};
 		});
-		output = output.replace(VAR_CURSOR, "");
+		let useSnippets = user_config.get<boolean>('useSnippets', false);
+		output = output.replace(VAR_CURSOR, useSnippets ? "$0" : "");
 	}
 	else { cursor.character = output.length; }
 
@@ -186,16 +187,21 @@ export function activate(context: vscode.ExtensionContext) {
 			let p2 =cursor.with(cursor.line, cursor.character-matched[0].length);
 			replace_range = new vscode.Range(cursor,p2);
 		}
-		editor.edit(e => { 
-			e.delete(replace_range);
-			e.insert( replace_range.end, fix.output) 
-		}).then(() => {
-		let characters = fix.cursor.character;
-		if (!fix.line) { characters += editor.selection.active.character; }
-		
-		var new_cursor = cursor.with(cursor.line + fix.cursor.line, characters);
-		editor.selection = new vscode.Selection(new_cursor, new_cursor);
-		});
+		let useSnippets = user_config.get<boolean>('useSnippets', false);
+		if (useSnippets) {
+			editor.insertSnippet(new vscode.SnippetString(fix.output), replace_range);
+		} else {
+			editor.edit(e => { 
+				e.delete(replace_range);
+				e.insert( replace_range.end, fix.output) 
+			}).then(() => {
+			let characters = fix.cursor.character;
+			if (!fix.line) { characters += editor.selection.active.character; }
+			
+			var new_cursor = cursor.with(cursor.line + fix.cursor.line, characters);
+			editor.selection = new vscode.Selection(new_cursor, new_cursor);
+			});
+		}
 	});
 	context.subscriptions.push(fix);
 
